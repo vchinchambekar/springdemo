@@ -1,0 +1,227 @@
+{
+  "kind": "Template",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "springdemo"
+  },
+  "labels": {
+    "template": "springdemo"
+  },
+  "parameters": [{
+    "name": "APPNAME",
+    "description": "The name of the app used in service/labels",
+    "value": "springdemo",
+    "required": true
+  }, {
+    "name": "APPROUTE",
+    "description": "The external FQDN the app should be available as",
+    "value": "",
+    "required": false
+  }, {
+    "name": "SOURCE_REPOSITORY_URL",
+    "description": "The URL of the repository with your source code",
+    "value": "https://github.com/arska/springdemo.git",
+    "required": true
+  }, {
+    "name": "SOURCE_REPOSITORY_REF",
+    "description": "The GIT branch/tag/commit",
+    "value": "master",
+    "required": true
+  }, {
+    "name": "GITHUB_WEBHOOK_SECRET",
+    "description": "A secret string used to configure the GitHub webhook",
+    "generate": "expression",
+    "from": "[a-zA-Z0-9]{40}"
+  }, {
+    "name": "GENERIC_WEBHOOK_SECRET",
+    "description": "A secret string used to configure the Generic webhook",
+    "generate": "expression",
+    "from": "[a-zA-Z0-9]{40}"
+  }],
+  "objects": [{
+    "kind": "ImageStream",
+    "apiVersion": "v1",
+    "metadata": {
+      "name": "${APPNAME}",
+      "labels": {
+        "appname": "${APPNAME}"
+      }
+    },
+    "spec": {
+      "dockerImageRepository": "",
+      "tags": [{
+        "name": "latest"
+      }]
+    }
+  }, {
+    "kind": "BuildConfig",
+    "apiVersion": "v1",
+    "metadata": {
+      "name": "${APPNAME}",
+      "labels": {
+        "appname": "${APPNAME}"
+      }
+    },
+    "spec": {
+      "triggers": [{
+        "type": "GitHub",
+        "github": {
+          "secret": "${GITHUB_WEBHOOK_SECRET}"
+        }
+      }, {
+        "type": "Generic",
+        "generic": {
+          "secret": "${GENERIC_WEBHOOK_SECRET}"
+        }
+      }, {
+        "type": "ConfigChange"
+      }, {
+        "type": "ImageChange",
+        "imageChange": {}
+      }],
+      "runPolicy": "Serial",
+      "source": {
+        "type": "Git",
+        "git": {
+          "uri": "${SOURCE_REPOSITORY_URL}",
+          "ref": "${SOURCE_REPOSITORY_REF}"
+        }
+      },
+      "strategy": {
+        "type": "Source",
+        "sourceStrategy": {
+          "from": {
+            "kind": "ImageStreamTag",
+            "namespace": "openshift",
+            "name": "wildfly:latest"
+          },
+          "incremental": true
+        }
+      },
+      "output": {
+        "to": {
+          "kind": "ImageStreamTag",
+          "name": "${APPNAME}:latest"
+        }
+      }
+    }
+  }, {
+    "kind": "DeploymentConfig",
+    "apiVersion": "v1",
+    "metadata": {
+      "name": "${APPNAME}",
+      "labels": {
+        "appname": "${APPNAME}"
+      }
+    },
+    "spec": {
+      "strategy": {
+        "type": "Rolling",
+        "rollingParams": {
+          "updatePeriodSeconds": 1,
+          "intervalSeconds": 1,
+          "timeoutSeconds": 600,
+          "maxUnavailable": "25%",
+          "maxSurge": "25%"
+        }
+      },
+      "triggers": [{
+        "type": "ConfigChange"
+      }, {
+        "type": "ImageChange",
+        "imageChangeParams": {
+          "automatic": true,
+          "containerNames": [
+            "${APPNAME}"
+          ],
+          "from": {
+            "kind": "ImageStreamTag",
+            "name": "${APPNAME}:latest"
+          }
+        }
+      }],
+      "replicas": 1,
+      "test": false,
+      "selector": {
+        "appname": "${APPNAME}",
+        "deploymentconfig": "${APPNAME}"
+      },
+      "template": {
+        "metadata": {
+          "labels": {
+            "appname": "${APPNAME}",
+            "deploymentconfig": "${APPNAME}"
+          }
+        },
+        "spec": {
+          "containers": [{
+            "name": "${APPNAME}",
+            "image": "${APPNAME}",
+            "ports": [{
+              "containerPort": 8080,
+              "protocol": "TCP"
+            }],
+            "readinessProbe": {
+              "httpGet": {
+                "path": "/health",
+                "port": 8080,
+                "scheme": "HTTP"
+              },
+              "initialDelaySeconds": 100,
+              "timeoutSeconds": 1,
+              "periodSeconds": 10,
+              "successThreshold": 1,
+              "failureThreshold": 3
+            },
+            "terminationMessagePath": "/dev/termination-log",
+            "imagePullPolicy": "Always"
+          }],
+          "restartPolicy": "Always",
+          "terminationGracePeriodSeconds": 100,
+          "dnsPolicy": "ClusterFirst"
+        }
+      }
+    }
+  }, {
+    "kind": "Service",
+    "apiVersion": "v1",
+    "metadata": {
+      "name": "${APPNAME}",
+      "labels": {
+        "appname": "${APPNAME}"
+      }
+    },
+    "spec": {
+      "ports": [{
+        "name": "8080-tcp",
+        "protocol": "TCP",
+        "port": 8080,
+        "targetPort": 8080
+      }],
+      "selector": {
+        "appname": "${APPNAME}",
+        "deploymentconfig": "${APPNAME}"
+      }
+    }
+  }, {
+    "kind": "Route",
+    "apiVersion": "v1",
+    "metadata": {
+      "name": "${APPNAME}",
+      "labels": {
+        "appname": "${APPNAME}"
+      }
+    },
+    "spec": {
+      "host": "${APPROUTE}",
+      "to": {
+        "kind": "Service",
+        "name": "${APPNAME}",
+        "weight": 100
+      },
+      "port": {
+        "targetPort": "8080-tcp"
+      }
+    }
+  } ]
+}

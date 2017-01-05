@@ -11,12 +11,19 @@ $ oc new-app openshift/wildfly:latest~https://github.com/arska/springdemo.git
 $ oc expose service springdemo
 ```
 
+This repo also contains an openshift template springdemo-template.json that you can use to instantiate the project, either manually though copy-pasting it to the Web-GUI ("Add to project", "Import YAML / JSON") or through the CLI:
+```
+$ oc new-app -f springdemo-template.json
+```
+
+Note that due to a race condition when instantiating the template (https://github.com/openshift/origin/issues/4518) the first build run can fail at pushing the resuling container ("Error pushing to registry: Authentication is required"), just start a new build in the Web-GUI oder CLI (oc new-build springdemo).
+
+When opening the app you should see "Hello!".
+
+You can check out the healthcheck-page at /health, the name of the pod at /env/jboss.node.name and other spring mappings at /mappings
+
 You can clean everything up with
 ```
 $ oc delete all -l app=springdemo
 ```
-
-When opening the app you should see "Hello!".
-
-You can manually add a readiness check to /health (the app has about 120s to boot after buiding and starting the pod) and you can check with pod you are hitting at /env/jboss.node.name
 
