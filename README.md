@@ -4,10 +4,10 @@ This repo contains an empty Java Spring Boot project created by https://start.sp
 
 I added a simple Controller Class (src/main/java/com/arska/SpringdemoController.java) to output "Hello!" when accessing the application root instead of an error.
 
-The build configuration in pom.xml outputs a WAR called ROOT.war that will be automatically deployed by the OpenShift 3 Source-to-Image (s2i) process for Wildfly.
-You can run this on OpenShift (e.g. http://appuio.ch) using the Web-GUI ("Add to project", select Wildfly, enter a name (e.g. springdemo) and GIT URL (e.g. https://github.com/appuio/springdemo.git) and "create") or CLI:
+The build configuration in pom.xml outputs a WAR called ROOT.war that will be automatically deployed by the OpenShift 3 Source-to-Image (s2i) process for JBoss.
+You can run this on OpenShift (e.g. http://appuio.ch) using the Web-GUI ("Add to project", select "JBoss Web Server 3.1 Apache Tomcat 8" Template, enter a name (e.g. springdemo) and GIT URL (e.g. https://github.com/appuio/springdemo.git) and "create") or CLI:
 ```
-$ oc new-app openshift/wildfly:latest~https://github.com/appuio/springdemo.git
+$ oc new-app openshift/jboss-webserver31-tomcat8-openshift:1.1~https://github.com/appuio/springdemo.git
 $ oc expose service springdemo
 ```
 
