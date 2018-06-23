@@ -20,7 +20,7 @@
   }, {
     "name": "SOURCE_REPOSITORY_URL",
     "description": "The URL of the repository with your source code",
-    "value": "https://github.com/arska/springdemo.git",
+    "value": "https://github.com/appuio/springdemo.git",
     "required": true
   }, {
     "name": "SOURCE_REPOSITORY_REF",
@@ -93,7 +93,7 @@
           "from": {
             "kind": "ImageStreamTag",
             "namespace": "openshift",
-            "name": "wildfly:latest"
+            "name": "jboss-webserver31-tomcat8-openshift:1.1"
           },
           "incremental": true
         }
