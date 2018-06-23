@@ -11,6 +11,8 @@ $ oc new-app openshift/jboss-webserver31-tomcat8-openshift:1.1~https://github.co
 $ oc expose service springdemo
 ```
 
+You might need to adjust RAM ressource limits as the 256MB is a bit tight for JBoss.
+
 This repo also contains an openshift template springdemo-template.json that you can use to instantiate the project, either manually though copy-pasting it to the Web-GUI ("Add to project", "Import YAML / JSON") or through the CLI:
 ```
 $ oc new-app -f springdemo-template.json
