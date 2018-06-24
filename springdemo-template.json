@@ -103,7 +103,12 @@
           "kind": "ImageStreamTag",
           "name": "${APPNAME}:latest"
         }
-      }
+      },
+			"resources": {
+					"limits": {
+							"memory": "1Gi"
+					}
+			}
     }
   }, {
     "kind": "DeploymentConfig",
@@ -163,7 +168,7 @@
             }],
             "readinessProbe": {
               "httpGet": {
-                "path": "/health",
+                "path": "/actuator/health",
                 "port": 8080,
                 "scheme": "HTTP"
               },
@@ -174,7 +179,12 @@
               "failureThreshold": 3
             },
             "terminationMessagePath": "/dev/termination-log",
-            "imagePullPolicy": "Always"
+            "imagePullPolicy": "Always",
+            "resources": {
+                "limits": {
+                    "memory": "500Mi"
+                }
+            }
           }],
           "restartPolicy": "Always",
           "terminationGracePeriodSeconds": 100,
