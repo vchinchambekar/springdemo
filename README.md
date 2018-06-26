@@ -5,24 +5,27 @@ This repo contains an empty Java Spring Boot project created by https://start.sp
 I added a simple Controller Class (src/main/java/com/arska/SpringdemoController.java) to output "Hello!" when accessing the application root instead of an error.
 
 The build configuration in pom.xml outputs a WAR called ROOT.war that will be automatically deployed by the OpenShift 3 Source-to-Image (s2i) process for JBoss.
-You can run this on OpenShift (e.g. http://appuio.ch) using the Web-GUI ("Add to project", select "JBoss Web Server 3.1 Apache Tomcat 8" Template, enter a name (e.g. springdemo) and GIT URL (e.g. https://github.com/appuio/springdemo.git) and "create") or CLI:
+You can run this on OpenShift (e.g. http://appuio.ch) using the Web-GUI ("Add to project", select "JBoss Web Server 3.1 Apache Tomcat 8" Template, enter a name (e.g. springdemo) and GIT URL (e.g. https://github.com/appuio/springdemo.git) and "create") or deploy via the CLI:
 ```
-$ oc new-app openshift/jboss-webserver31-tomcat8-openshift:1.1~https://github.com/appuio/springdemo.git
-$ oc expose service springdemo
-```
-
-You might need to adjust RAM ressource limits as the 256MB is a bit tight for JBoss.
-
-This repo also contains an openshift template springdemo-template.json that you can use to instantiate the project, either manually though copy-pasting it to the Web-GUI ("Add to project", "Import YAML / JSON") or through the CLI:
-```
-$ oc new-app -f springdemo-template.json
+oc new-app openshift/jboss-webserver31-tomcat8-openshift:1.1~https://github.com/appuio/springdemo.git
+oc patch bc/springdemo -p '{"spec":{"resources":{"limits":{"memory":"500Mi"}}}}'
+oc patch dc/springdemo -p '{"spec":{"template":{"spec":{"containers":[{"name":"springdemo","resources":{"limits":{"memory": "500Mi"}}}]}}}}'
+oc start-build springdemo
+oc expose service springdemo
 ```
 
-Note that due to a race condition when instantiating the template (https://github.com/openshift/origin/issues/4518) the first build run can fail at pushing the resuling container ("Error pushing to registry: Authentication is required"), just start a new build in the Web-GUI oder CLI (oc new-build springdemo).
+As you can see we need to adjust the RAM ressource limit for the build and deployment as the default 256MB is too tight for JBoss.
 
-When opening the app you should see "Hello!".
+This repo also contains an openshift template springdemo-template.json that you can use to instantiate the project including proper limits and health checks, either manually though copy-pasting it to the Web-GUI ("Add to project", "Import YAML / JSON") or through the CLI:
+```
+oc new-app -f https://raw.githubusercontent.com/appuio/springdemo/master/springdemo-template.json -p APPNAME=springdemo
+```
 
-You can check out the healthcheck-page at /health, the name of the pod at /env/jboss.node.name and other spring mappings at /mappings
+Note that due to a race condition when instantiating the template (https://github.com/openshift/origin/issues/4518) the first build run might fail at pushing the resuling container ("Error pushing to registry: Authentication is required"), just start a new build in the Web-GUI oder CLI (oc new-build springdemo).
+
+When opening the app URL you should see "Hello!".
+
+You can check out the healthcheck-page at /actuator/health
 
 You can clean everything up with
 ```

@@ -104,11 +104,11 @@
           "name": "${APPNAME}:latest"
         }
       },
-			"resources": {
-					"limits": {
-							"memory": "1Gi"
-					}
-			}
+      "resources": {
+        "limits": {
+          "memory": "500Mi"
+        }
+      }
     }
   }, {
     "kind": "DeploymentConfig",
@@ -181,9 +181,9 @@
             "terminationMessagePath": "/dev/termination-log",
             "imagePullPolicy": "Always",
             "resources": {
-                "limits": {
-                    "memory": "500Mi"
-                }
+              "limits": {
+                "memory": "500Mi"
+              }
             }
           }],
           "restartPolicy": "Always",
