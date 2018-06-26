@@ -10,7 +10,7 @@ You can run this on OpenShift (e.g. http://appuio.ch) using the Web-GUI ("Add to
 oc new-app openshift/jboss-webserver31-tomcat8-openshift:1.1~https://github.com/appuio/springdemo.git
 oc patch bc/springdemo -p '{"spec":{"resources":{"limits":{"memory":"500Mi"}}}}'
 oc patch dc/springdemo -p '{"spec":{"template":{"spec":{"containers":[{"name":"springdemo","resources":{"limits":{"memory": "500Mi"}}}]}}}}'
-oc cancel-build springdemo
+oc cancel-build springdemo-1
 oc start-build springdemo
 oc expose service springdemo
 ```
@@ -30,7 +30,7 @@ You can check out the healthcheck-page at /actuator/health
 
 You can clean everything up with
 ```
-$ oc delete all -l app=springdemo
+oc delete all -l app=springdemo
 ```
 
 For more information about templates: see https://docs.openshift.com/container-platform/latest/dev_guide/templates.html
