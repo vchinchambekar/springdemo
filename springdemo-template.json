@@ -59,7 +59,7 @@
     "metadata": {
       "name": "${APPNAME}",
       "labels": {
-        "appname": "${APPNAME}"
+        "app": "${APPNAME}"
       }
     },
     "spec": {
