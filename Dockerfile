@@ -33,3 +33,4 @@ CMD java -Xmx64m -Xss1024k -jar /opt/app-root/springdemo.jar
 
 # the application will listen on this port
 EXPOSE 8080
+

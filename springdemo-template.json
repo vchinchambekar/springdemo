@@ -44,7 +44,7 @@
     "metadata": {
       "name": "${APPNAME}",
       "labels": {
-        "appname": "${APPNAME}"
+        "app": "${APPNAME}"
       }
     },
     "spec": {
@@ -116,7 +116,7 @@
     "metadata": {
       "name": "${APPNAME}",
       "labels": {
-        "appname": "${APPNAME}"
+        "app": "${APPNAME}"
       }
     },
     "spec": {
@@ -148,13 +148,13 @@
       "replicas": 1,
       "test": false,
       "selector": {
-        "appname": "${APPNAME}",
+        "app": "${APPNAME}",
         "deploymentconfig": "${APPNAME}"
       },
       "template": {
         "metadata": {
           "labels": {
-            "appname": "${APPNAME}",
+            "app": "${APPNAME}",
             "deploymentconfig": "${APPNAME}"
           }
         },
@@ -198,7 +198,7 @@
     "metadata": {
       "name": "${APPNAME}",
       "labels": {
-        "appname": "${APPNAME}"
+        "app": "${APPNAME}"
       }
     },
     "spec": {
@@ -209,7 +209,7 @@
         "targetPort": 8080
       }],
       "selector": {
-        "appname": "${APPNAME}",
+        "app": "${APPNAME}",
         "deploymentconfig": "${APPNAME}"
       }
     }
@@ -219,7 +219,7 @@
     "metadata": {
       "name": "${APPNAME}",
       "labels": {
-        "appname": "${APPNAME}"
+        "app": "${APPNAME}"
       }
     },
     "spec": {

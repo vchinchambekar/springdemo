@@ -10,6 +10,7 @@ You can run this on OpenShift (e.g. http://appuio.ch) using the Web-GUI ("Add to
 oc new-app openshift/jboss-webserver31-tomcat8-openshift:1.1~https://github.com/appuio/springdemo.git
 oc patch bc/springdemo -p '{"spec":{"resources":{"limits":{"memory":"500Mi"}}}}'
 oc patch dc/springdemo -p '{"spec":{"template":{"spec":{"containers":[{"name":"springdemo","resources":{"limits":{"memory": "500Mi"}}}]}}}}'
+oc cancel-build springdemo
 oc start-build springdemo
 oc expose service springdemo
 ```
@@ -33,4 +34,17 @@ $ oc delete all -l app=springdemo
 ```
 
 For more information about templates: see https://docs.openshift.com/container-platform/latest/dev_guide/templates.html
+
+You can also build/run this example locally using docker:
+```
+docker build -t springdemo .
+docker run -p 8080:8080 springdemo
+```
+The application is then accessible at http://127.0.0.1:8080/
+
+And you can of course also use the Docker builder on OpenShift:
+```
+oc new-app --strategy=docker https://github.com/appuio/springdemo.git
+oc expose service springdemo
+```
 
