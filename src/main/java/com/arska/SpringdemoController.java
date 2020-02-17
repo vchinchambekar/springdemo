@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class SpringdemoController {
   @RequestMapping("/")
   public String index() {
-    return "Hello! Vijay C";
+    return "Hello! This is Demo Test";
   }
 }
